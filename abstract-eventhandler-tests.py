@@ -16,16 +16,6 @@ class TestUpdate(unittest.TestCase):
     def tearDown(self):
         pass
 
-    # def test_main_arguments(self):
-    #
-    #     args = ['CRITICAL', 'SOFT', '3', 'AB-Infasa']
-    #
-    #     with mock.patch('abstract_eventhandler.main', return_value=None) as m:
-    #         main(args)
-    #
-    #         #Should assert method was called
-    #         self.assertTrue(m.called)
-
     def test_parse_state(self):
         em = EventHandler('CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore')
 
@@ -69,7 +59,7 @@ class TestUpdate(unittest.TestCase):
     def test_parse_soft_state_wrong_soft_attempt(self):
 
         #Should be false because the attempt it's below the acceptable. pss: 3
-        em = EventHandler('CRITICAL', 'SOFT', '2', 'AB-Infasa', 'ignore', 'CRITICAL', 3, 3)
+        em = EventHandler('CRITICAL', 'SOFT', '2', 'AB-Infasa', 'ignore', 'CRITICAL', 3)
 
         should_be_false = em.parse_soft_attempt()
         self.assertFalse(should_be_false)
@@ -77,7 +67,7 @@ class TestUpdate(unittest.TestCase):
     def test_parse_soft_state_soft_attempt(self):
 
         #Should be false because the attempt it's below the acceptable. pss: 3
-        em = EventHandler('CRITICAL', 'SOFT', '4', 'AB-Infasa', 'ignore', 'CRITICAL', 3, 3)
+        em = EventHandler('CRITICAL', 'SOFT', '4', 'AB-Infasa', 'ignore', 'CRITICAL', 3)
 
         should_be_true = em.parse_soft_attempt()
         self.assertTrue(should_be_true)
@@ -85,7 +75,7 @@ class TestUpdate(unittest.TestCase):
     def test_parse_soft_state_soft_attempt_wrong_state(self):
 
         #Should be false because the attempt it's below the acceptable. pss: 3
-        em = EventHandler('WARNING', 'SOFT', '4', 'AB-Infasa', 'ignore', 'CRITICAL', 3, 3)
+        em = EventHandler('WARNING', 'SOFT', '4', 'AB-Infasa', 'ignore', 'CRITICAL', 3)
 
         should_be_false = em.parse_soft_attempt()
         self.assertFalse(should_be_false)
@@ -120,16 +110,23 @@ class TestUpdate(unittest.TestCase):
         should_be_true = em.should_call_handler()
         self.assertTrue(should_be_true)
 
-    def test_should_call_handler_hard_state_right_state_and_attempt_wrong_type(self):
+    def test_should_call_handler_soft_state_wrong_attempt(self):
         # This is true for HARD state but we passed soft state
-        em = EventHandler('CRITICAL', 'SOFT', '4', 'AB-Infasa', 'ignore')
+        em = EventHandler('CRITICAL', 'SOFT', '2', 'AB-Infasa', 'ignore')
 
         should_be_false = em.should_call_handler()
         self.assertFalse(should_be_false)
 
-    def test_should_call_handler_hard_state_right_state_and_attempt_wrong_type(self):
+    def test_should_call_handler_soft_state_right_attempt(self):
+        # Default for soft attempt is 3
+        em = EventHandler('CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore')
+
+        should_be_true = em.should_call_handler()
+        self.assertTrue(should_be_true)
+
+    def test_should_call_handler_hard_state_right_state_and_ignore_attempt(self):
         # This is true for HARD state but we pass soft state
-        em = EventHandler('CRITICAL', 'HARD', '20', 'AB-Infasa', 'ignore', 'CRITICAL', 3, 3)
+        em = EventHandler('CRITICAL', 'HARD', '20', 'AB-Infasa', 'ignore', 'CRITICAL', 3)
 
         should_be_true = em.should_call_handler()
         self.assertTrue(should_be_true)

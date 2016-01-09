@@ -120,7 +120,7 @@ def main(args):
 class EventHandler:
     @timeit
     def __init__(self, service_state, service_state_type, service_attempt, hostname,
-                 handler_name, handle_state="CRITICAL", handle_on_soft_attempt=None):
+                 handler_name, handle_state="CRITICAL", handle_on_soft_attempt=3):
         """
         :param service_state: The current state of the service ("OK", "WARNING", "UNKNOWN", or "CRITICAL").
         :param service_state_type: The state type for the current service check ("HARD" or "SOFT").
