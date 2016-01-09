@@ -4,9 +4,58 @@ import mock
 from mock import patch, Mock
 from mock import PropertyMock
 
-class TestUpdate(unittest.TestCase):
+class TestEventHandlerBuild(unittest.TestCase):
+
     """
-    Tests related to the abstract Event Handler
+    Tests related to the building of anEvent Handler
+    """
+
+    def setUp(self):
+
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_non_optional_arguments(self):
+        args = ['CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore']
+        expected = EventHandler('CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore')
+        got = parse_args(args)
+
+        self.assertEqual(expected.service_state, got.service_state)
+        self.assertEqual(expected.service_state_type, got.service_state_type)
+        self.assertEqual(expected.service_attempt, got.service_attempt)
+        self.assertEqual(expected.hostname, got.hostname)
+        self.assertEqual(expected.handler_name, got.handler_name)
+
+    def test_optionals_arguments_handler_state(self):
+        args = ['CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore', 'WARNING']
+        expected = EventHandler('CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore','WARNING')
+        got = parse_args(args)
+
+        self.assertEqual(expected.service_state, got.service_state)
+        self.assertEqual(expected.service_state_type, got.service_state_type)
+        self.assertEqual(expected.service_attempt, got.service_attempt)
+        self.assertEqual(expected.hostname, got.hostname)
+        self.assertEqual(expected.handler_name, got.handler_name)
+        self.assertEqual(expected.handle_state, got.handle_state)
+
+    def test_optionals_arguments_handle_on_soft_attempt(self):
+        args = ['CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore', 'WARNING', '4']
+        expected = EventHandler('CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore','WARNING', '4')
+        got = parse_args(args)
+
+        self.assertEqual(expected.service_state, got.service_state)
+        self.assertEqual(expected.service_state_type, got.service_state_type)
+        self.assertEqual(expected.service_attempt, got.service_attempt)
+        self.assertEqual(expected.hostname, got.hostname)
+        self.assertEqual(expected.handler_name, got.handler_name)
+        self.assertEqual(expected.handle_state, got.handle_state)
+        self.assertEqual(expected.handle_on_soft_attempt, got.handle_on_soft_attempt)
+
+class TestParse(unittest.TestCase):
+    """
+    Tests related to parsing the Event Handler
     """
 
     def setUp(self):

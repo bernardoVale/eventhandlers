@@ -84,6 +84,33 @@ def create_connection():
 
 
 @timeit
+def parse_args(args):
+    """
+    Parse script arguments and return an instance of EventHandler class
+    :param args:
+    :return:EventHandler
+    """
+    if len(args) == 5:
+        service_state, service_state_type, service_attempt, hostname, handler_name = args
+
+        return EventHandler(service_state, service_state_type, service_attempt, hostname, handler_name)
+
+    elif len(args) == 6:
+
+        service_state, service_state_type, service_attempt, hostname, handler_name, handle_state = args
+
+        return EventHandler(service_state, service_state_type, service_attempt, hostname, handler_name, handle_state)
+
+    elif len(args) == 7:
+
+        service_state, service_state_type, service_attempt, hostname, \
+        handler_name, handle_state, handle_on_soft_attempt = args
+
+        return EventHandler(service_state, service_state_type,
+                            service_attempt, hostname, handler_name, handle_state, handle_on_soft_attempt)
+
+
+@timeit
 def main(args):
     """
     service_state:
@@ -96,21 +123,18 @@ def main(args):
     filename = '/var/log/nagios/eventhandler.log'
 
     # Setup logging
-    logging.basicConfig(level=logging.INFO, filename=filename, format='%(asctime)s - %(name)s - %(message)s')
+    logging.basicConfig(level=logging.DEBUG, filename=filename, format='%(asctime)s - %(name)s - %(message)s')
     stdout_logger = logging.getLogger('STDOUT')
     sl = StreamToLogger(stdout_logger, logging.INFO)
     sys.stdout = sl
 
     # Setup variables
-    service_state, service_state_type, service_attempt, hostname, handler_name = args
-
-    # Build an EventHandler
-    ev = EventHandler(service_state, service_state_type, service_attempt, hostname, handler_name)
+    ev = parse_args(args)
 
     # If true call the specified Event Handler
     try:
         if ev.should_call_handler():
-
+            print "Abstract EventHandler arguments: %s" % args
             ev.handle()
 
     except Exception, e:
