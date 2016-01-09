@@ -166,6 +166,21 @@ class EventHandler:
         self.handle_state = handle_state
         self.handle_on_soft_attempt = handle_on_soft_attempt
 
+        self.parsed_handled_state()
+
+    @timeit
+    def parsed_handled_state(self):
+        """
+        This method was created to allow handling on multiples states like WARNING and CRITICAL
+        :return:
+        """
+
+        if ',' in self.handle_state:
+            # Transform it into a list
+            self.handle_state = self.handle_state.split(',')
+
+
+
     @timeit
     def handle(self):
         """
@@ -221,7 +236,7 @@ class EventHandler:
         :return: bool
         """
 
-        if self.service_state == self.handle_state:
+        if self.service_state in self.handle_state:
             return True
         else:
             return False

@@ -79,6 +79,28 @@ class TestParse(unittest.TestCase):
 
         self.assertFalse(should_be_false)
 
+    def test_parse_state_multiples(self):
+
+        em = EventHandler('WARNING', 'SOFT', '3', 'AB-Infasa', 'ignore', 'CRITICAL,WARNING')
+
+        should_be_true = em.parse_state()
+
+        self.assertTrue(should_be_true)
+
+        em = EventHandler('CRITICAL', 'SOFT', '3', 'AB-Infasa', 'ignore', 'CRITICAL,WARNING')
+
+        should_be_true = em.parse_state()
+
+        self.assertTrue(should_be_true)
+
+    def test_parse_state_multiples_with_aditional_comma_should_work_too(self):
+
+        em = EventHandler('WARNING', 'SOFT', '3', 'AB-Infasa', 'ignore', 'CRITICAL,WARNING,')
+
+        should_be_true = em.parse_state()
+
+        self.assertTrue(should_be_true)
+
     def test_parse_service_attempt(self):
         em = EventHandler('OK', 'SOFT', '3', 'AB-Infasa', 'ignore')
 
