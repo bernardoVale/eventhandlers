@@ -6,6 +6,7 @@ import time
 from paramiko import SSHClient
 import paramiko
 
+
 class StreamToLogger(object):
     """
    Fake file-like stream object that redirects writes to a logger instance.
@@ -16,7 +17,6 @@ class StreamToLogger(object):
         self.logger = logger
         self.log_level = log_level
         self.linebuf = ''
-
 
     def write(self, buf):
 
@@ -36,11 +36,13 @@ def timeit(method):
         result = method(*args, **kw)
         te = time.time()
 
-        print '%r (%r, %r) %2.2f sec' % \
-              (method.__name__, args, kw, te - ts)
+        #Logging only on DEBUG.
+        logging.debug('%r (%r, %r) %2.2f sec' %
+              (method.__name__, args, kw, te - ts))
         return result
 
     return timed
+
 
 @timeit
 def run_remote_command(client, command, work_dir=None):
@@ -55,9 +57,9 @@ def run_remote_command(client, command, work_dir=None):
     if work_dir:
         command = "cd %s;%s" % (work_dir, command)
 
-
     stdin, stdout, stderr = client.exec_command(command)
     return stderr.read(), stdout.read()
+
 
 @timeit
 def create_connection():
@@ -81,7 +83,6 @@ def create_connection():
     return client
 
 
-
 @timeit
 def main(args):
     """
@@ -95,7 +96,7 @@ def main(args):
     filename = '/var/log/nagios/eventhandler.log'
 
     # Setup logging
-    logging.basicConfig(level=logging.INFO, filename=filename)
+    logging.basicConfig(level=logging.INFO, filename=filename, format='%(asctime)s - %(name)s - %(message)s')
     stdout_logger = logging.getLogger('STDOUT')
     sl = StreamToLogger(stdout_logger, logging.INFO)
     sys.stdout = sl
@@ -109,6 +110,7 @@ def main(args):
     # If true call the specified Event Handler
     try:
         if ev.should_call_handler():
+
             ev.handle()
 
     except Exception, e:
@@ -200,7 +202,6 @@ class EventHandler:
         else:
             return False
 
-
     @timeit
     def parse_soft_attempt(self):
         """
@@ -216,7 +217,6 @@ class EventHandler:
 
         return False
 
-
     @timeit
     def parse_hard_attempt(self):
         """
@@ -227,7 +227,6 @@ class EventHandler:
         if self.parse_state():
             return True
         return False
-
 
     @timeit
     def parse_attempt(self, attempt):
