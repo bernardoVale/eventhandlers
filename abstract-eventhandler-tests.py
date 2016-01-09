@@ -43,24 +43,24 @@ class TestUpdate(unittest.TestCase):
     def test_parse_service_attempt(self):
         em = EventHandler('OK', 'SOFT', '3', 'AB-Infasa', 'ignore')
 
-        should_be_true = em.parse_attempt(em.handle_attempt)
+        should_be_true = em.parse_attempt(3)
         self.assertTrue(should_be_true)
 
         em = EventHandler('OK', 'SOFT', '5', 'AB-Infasa', 'ignore')
 
-        should_be_true = em.parse_attempt(em.handle_attempt)
+        should_be_true = em.parse_attempt(3)
         self.assertTrue(should_be_true)
 
     def test_parse_service_attempt_false(self):
-        em = EventHandler('OK', 'SOFT', '2', 'AB-Infasa', 'ignore')
+        em = EventHandler('OK', 'SOFT', '4', 'AB-Infasa', 'ignore')
 
-        should_be_false = em.parse_attempt(em.handle_attempt)
+        should_be_false = em.parse_attempt(5)
         self.assertFalse(should_be_false)
 
 
     def test_parse_soft_state(self):
         #Since we are passing the default, handle on soft it's not desirable
-        em = EventHandler('OK', 'SOFT', '2', 'AB-Infasa', 'ignore')
+        em = EventHandler('OK', 'SOFT', '1', 'AB-Infasa', 'ignore')
 
 
         should_be_false = em.parse_soft_attempt()
@@ -108,9 +108,9 @@ class TestUpdate(unittest.TestCase):
     def test_parse_hard_state_right_state_and_wrong_attempt(self):
         em = EventHandler('CRITICAL', 'HARD', '2', 'AB-Infasa', 'ignore')
 
-
-        should_be_false = em.parse_hard_attempt()
-        self.assertFalse(should_be_false)
+        #Issue 1 = Ignore attempt in hard state
+        should_be_true = em.parse_hard_attempt()
+        self.assertTrue(should_be_true)
 
 
     def test_should_call_handler_hard_state_right_state_and_attempt(self):
@@ -129,7 +129,7 @@ class TestUpdate(unittest.TestCase):
 
     def test_should_call_handler_hard_state_right_state_and_attempt_wrong_type(self):
         # This is true for HARD state but we pass soft state
-        em = EventHandler('CRITICAL', 'HARD', '4', 'AB-Infasa', 'ignore', 'CRITICAL', 3, 3)
+        em = EventHandler('CRITICAL', 'HARD', '20', 'AB-Infasa', 'ignore', 'CRITICAL', 3, 3)
 
         should_be_true = em.should_call_handler()
         self.assertTrue(should_be_true)

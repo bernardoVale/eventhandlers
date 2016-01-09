@@ -91,8 +91,11 @@ def main(args):
     hostname: Name of the host
     """
 
-    #Setup logging
-    logging.basicConfig(level=logging.INFO, filename='/var/log/nagios/eventhandler.log')
+    #Standard log
+    filename = '/var/log/nagios/eventhandler.log'
+
+    # Setup logging
+    logging.basicConfig(level=logging.INFO, filename=filename)
     stdout_logger = logging.getLogger('STDOUT')
     sl = StreamToLogger(stdout_logger, logging.INFO)
     sys.stdout = sl
@@ -117,14 +120,13 @@ def main(args):
 class EventHandler:
     @timeit
     def __init__(self, service_state, service_state_type, service_attempt, hostname,
-                 handler_name, handle_state="CRITICAL", handle_attempt=1, handle_on_soft_attempt=None):
+                 handler_name, handle_state="CRITICAL", handle_on_soft_attempt=None):
         """
         :param service_state: The current state of the service ("OK", "WARNING", "UNKNOWN", or "CRITICAL").
         :param service_state_type: The state type for the current service check ("HARD" or "SOFT").
         :param service_attempt: The number of the current service check retry.
         :param hostname: The name of the host
         :param handle_state: Should run a handler on witch state, see variable service_state
-        :param handle_attempt: Should run a handler on witch service_attempt
         :param handle_on_soft_attempt: Should handle on witch soft attempt, if None handle only on HARD state
         :param handler_name: Name of the handler (Playbook name)
         :return:
@@ -136,7 +138,6 @@ class EventHandler:
         self.hostname = hostname
         self.handler_name = handler_name
         self.handle_state = handle_state
-        self.handle_attempt = handle_attempt
         self.handle_on_soft_attempt = handle_on_soft_attempt
 
     @timeit
@@ -224,11 +225,7 @@ class EventHandler:
         """
         # Check if it's on the right state
         if self.parse_state():
-
-            # Check if the soft attempt it's above the call limit
-            if self.parse_attempt(self.handle_attempt):
-                return True
-
+            return True
         return False
 
 
